@@ -4,9 +4,11 @@ if ls src >/dev/null 2>&1; then
     exit 1
 fi
 
+mkdir src
+
 pushd src
     wget https://www.linuxfromscratch.org/lfs/view/stable/wget-list-sysv
     wget https://www.linuxfromscratch.org/lfs/view/stable/md5sums
-    wget --input-file=../scripts/wget-list-sysv --continue --directory-prefix=$(pwd)
+    wget --input-file=./wget-list-sysv --continue --directory-prefix=$(pwd)
 popd
 
