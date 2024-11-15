@@ -1,13 +1,4 @@
 #!/bin/bash
-# Set Environment
-export LFS=/mnt/lfs
-
-# Set up environment
-cat > ~/.bash_profile << "EOF"
-exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash
-EOF
-
-cat > ~/.bashrc << "EOF"
 set +h
 umask 022
 LFS=/mnt/lfs
@@ -18,43 +9,8 @@ if [ ! -L /bin ]; then PATH=/bin:$PATH; fi
 PATH=$LFS/tools/bin:$PATH
 CONFIG_SITE=$LFS/usr/share/config.site
 export LFS LC_ALL LFS_TGT PATH CONFIG_SITE
-EOF
-
-source ~/.bashrc
 
 export MAKEFLAGS="-j$(nproc)"
-
-echo "/usr/bin/awk: $(ls -alh /etc/alternatives/awk)"
-echo "awk should be a symlink to gawk"
-echo "/usr/bin/yacc: $(ls -lah /etc/alternatives/yacc)"
-echo "yacc should be a symlink to bison"
-
-echo "=== Building binutils-2.43.1 ==="
-if grep binutils $LFS/built.txt; then
-    echo "binutils is already built."
-else
-    cd /mnt/lfs/sources
-    mkdir -pv /lfs/tmp/binutils
-    tar -xf binutils-2.43.1.tar.xz -C /lfs/tmp/binutils
-    cd /lfs/tmp/binutils/binutils-*
-    mkdir build
-    cd build
-    ../configure --prefix=$LFS/tools \
-                 --with-sysroot=$LFS \
-                 --target=$LFS_TGT   \
-                 --disable-nls       \
-                 --enable-gprofng=no \
-                 --disable-werror    \
-                 --enable-new-dtags  \
-                 --enable-default-hash-style=gnu
-    make && make install
-    echo "Exit Code: $?"
-    cd /mnt/lfs/sources
-    echo "=== Cleaning up binutils ==="
-    rm -rf /lfs/tmp/binutils
-    echo "binutils" >> $LFS/built.txt
-fi
-echo "=== DONE Building binutils-2.43.1 ==="
 
 echo "=== Building GCC-14.2.0 - Pass 1 ==="
 if grep gcc-phase1 $LFS/built.txt; then
@@ -103,9 +59,15 @@ else
 
     make && make install
     echo "Exit Code: $?"
+    cd ..
+    cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
+        `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include/limits.h
     cd /mnt/lfs/sources
     echo "=== Cleaning up gcc ==="
     rm -rf /lfs/tmp/gcc
     echo "gcc-phase1" >> $LFS/built.txt
 fi
 echo "=== DONE Building GCC-14.2.0 - Pass 1 ==="
+
+cd /mnt/lfs/sources
+
