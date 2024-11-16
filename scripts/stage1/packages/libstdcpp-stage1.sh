@@ -1,5 +1,5 @@
 #!/bin/bash
-set +h
+set -e +h
 umask 022
 LFS=/mnt/lfs
 LC_ALL=POSIX

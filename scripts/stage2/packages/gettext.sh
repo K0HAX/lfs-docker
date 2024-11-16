@@ -1,5 +1,5 @@
 #!/bin/bash
-set +h
+set -e +h
 
 cd /sources
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-set +h
+set -e +h
 umask 022
 LFS=/mnt/lfs
 LC_ALL=POSIX
@@ -27,7 +27,7 @@ else
     make
     make DESTDIR=$LFS install
 
-    cd $LFS/sed
+    cd $LFS/sources
     echo "=== Cleaning up Sed ==="
     rm -rf /lfs/tmp/sed
     echo "sed" >> $LFS/built.txt
